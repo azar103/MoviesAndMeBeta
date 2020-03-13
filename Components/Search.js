@@ -3,6 +3,7 @@ import { View, Button,TextInput,  FlatList ,Text,  StyleSheet , ActivityIndicato
 import films from '../Helpers/filmsData'
 import FilmItem from './FilmItem'
 import {getFilmsBySearchedText} from '../API/TMDBApi'
+import { connect } from 'react-redux'
 
 class Search extends React.Component {
     constructor(props){
@@ -72,6 +73,7 @@ class Search extends React.Component {
                  data = {this.state.films}
                  renderItem={({item}) => <FilmItem 
                   film={item}
+                  isFavoriteFilm={(this.props.favoritesFilm.findIndex((film) => film.id === item.id ) !== -1 ? true: false)}
                   navigate={this._navigateToFilmDetail}
                   />}
                  keyExtractor = {(item) => item.id.toString()}
@@ -81,6 +83,7 @@ class Search extends React.Component {
                         this._loadFilms()
                    }
                  }}
+                 extraData={this.props.favoritesFilm}
              />
              {this._displayLoading()}
         </View>
@@ -112,4 +115,10 @@ const styles = StyleSheet.create({
     }
 })
 
-export default Search
+const mapStateToProps = (state) => {
+  return {
+    favoritesFilm: state.favoritesFilm
+  }
+}
+
+export default connect(mapStateToProps)(Search)

@@ -1,10 +1,10 @@
-
 import React from 'react'
 import { StyleSheet, View, Text, Image, ActivityIndicator } from 'react-native'
 import { getFilmDetailFromApi, getImageFromApi } from '../API/TMDBApi'
-import { ScrollView } from 'react-native-gesture-handler'
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
 import moment from 'moment'
 import numeral from 'numeral'
+import { connect } from 'react-redux'
 class FilmDetail extends React.Component{
     constructor(props){
         super(props)
@@ -30,6 +30,26 @@ componentDidMount() {
 
      
 }
+
+
+_toggleFavorite () {
+ 
+    this.props.dispatch( { type: 'TOGGLE_FAVORITE', value: this.state.film})
+}
+
+_displayImage = () => {
+    let source = require('../Images/ic_favorite_border.png')
+    if(this.props.favoritesFilm.findIndex((item) => item.id === this.state.film.id) == -1){
+        source = require('../Images/ic_favorite.png')  
+    }
+
+    return(
+        <Image 
+        style={styles.icone}
+            source={source}
+        />
+    )
+}
 _displayLoading(){
     if(this.state.isLoading){
         return(
@@ -38,7 +58,6 @@ _displayLoading(){
             </View>
         )
     }
-   
 }
 _displayFilm(){
     const {title, backdrop_path, overview, release_date, vote_average, vote_count, budget, genres, production_companies} = this.state.film
@@ -46,6 +65,13 @@ _displayFilm(){
         <ScrollView style={styles.main_container}>
                 <Image style={styles.image_style} source={{uri: getImageFromApi(backdrop_path)}} />
                 <Text style={styles.title_style}>{title}</Text>
+                <TouchableOpacity
+                   style={styles.icone_container}
+                   onPress={() => this._toggleFavorite()}
+                >
+                 {this._displayImage()}
+
+                </TouchableOpacity>
                 <Text style={styles.overview}>{overview}</Text>
                 <Text style={styles.default_text}>Sorti le {moment(release_date).format('DD/MM/YYYY')}</Text>
                 <Text style={styles.default_text}>Note: {vote_average}/10</Text>
@@ -62,7 +88,7 @@ _displayFilm(){
     render() {
         
         console.log(this.state.film)
-        if(this.state.film ){
+        if(this.state.film!=undefined ){
             return(
                 <View style={styles.main_container}>
                 {this._displayLoading()}
@@ -115,7 +141,21 @@ const styles = StyleSheet.create({
         right: 0,
         bottom: 0,
         left: 0
+    },
+    icone_container: {
+        alignItems:'center',
+        justifyContent:'center'
+    },
+    icone: {
+        width: 40,
+        height: 40
     }
 })
 
-export default FilmDetail
+const mapStateToProps = (state) => {
+    return{
+        favoritesFilm: state.favoritesFilm
+    }
+}
+
+export default connect(mapStateToProps)(FilmDetail)

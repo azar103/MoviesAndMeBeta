@@ -2,11 +2,26 @@ import React from 'react'
 import {StyleSheet, View, Text, Image } from 'react-native'
 import { getImageFromApi } from '../API/TMDBApi'
 import { TouchableOpacity } from 'react-native-gesture-handler'
+import { connect } from 'react-redux'
 class FilmItem extends React.Component {
   constructor(props){
     super(props)
   }
 
+
+
+_displayImage(){
+  if(this.props.isFavoriteFilm){
+    return(
+
+    <Image 
+        style={styles.icone}
+        source={require('../Images/ic_favorite_border.png')}
+    />
+   
+    )
+  }
+}
 
 
   render() {
@@ -19,6 +34,7 @@ class FilmItem extends React.Component {
                <Image  style={styles.image_style} source={{uri: getImageFromApi(poster_path)}}/>
                <View style={styles.view_content}>
                      <View style={styles.view_header}>
+                        {this._displayImage()}
                         <Text style={styles.title_style}>{title}</Text>
                         <Text style={styles.vote_average_style}>{vote_average}</Text>
                      </View>
@@ -83,8 +99,16 @@ const styles = StyleSheet.create({
        marginRight: 5,
        fontSize: 14,
        fontWeight:'bold',
-
+     },
+     icone: {
+       width: 30,
+       height: 30,
+       marginRight: 5
      }
 })
+
+
+
+
 
 export default FilmItem
